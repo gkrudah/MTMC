@@ -14,10 +14,9 @@ GET_OPENPOSE          = true;
 GET_FGMASKS           = false;
 GET_REID              = true;
 GET_VIDEO_REID        = false;
-
+GET_FRAMES            = false; % Not included in GET_ALL to save space, must be manually set on
 
 options = weboptions('Timeout', 60);
-
 
 %% Create folder structure
 fprintf('Creating folder structure...\n');
@@ -84,7 +83,6 @@ if GET_ALL || GET_VIDEOS
     fprintf('Data download complete.\n');
 end
 
-
 %% Download DPM detections
 if GET_ALL || GET_DPM
     fprintf('Downloading detections...\n');
@@ -139,4 +137,19 @@ if GET_ALL || GET_VIDEO_REID
     fprintf('DukeMTMC-VideoReID.zip\n');
     websave(filename,url,options);
     unzip(filename, dataset.savePath);
+end
+
+%% Extract frames
+if GET_FRAMES
+    fprintf('Extracting frames...\n');
+    ffmpegPath = 'C:/ffmpeg/bin/ffmpeg.exe';
+    currDir = pwd;
+    for cam = 1:dataset.numCameras
+        cd([dataset.savePath 'videos/camera' num2str(cam)]); 
+        filelist = '"concat:00000.MTS';
+        for k = 1:dataset.videoParts(cam), filelist = [filelist, '|0000', num2str(k), '.MTS']; end; 
+        framesDir = [dataset.savePath 'frames/camera' num2str(cam) '/%06d.jpg'];
+        command = [ffmpegPath ' -i ' filelist '" -qscale:v 1 -f image2 ' framesDir];
+        system(command);
+    end
 end

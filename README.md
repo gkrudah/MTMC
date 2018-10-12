@@ -186,6 +186,12 @@ If this code helps your research, please cite the following work which made it p
 }
 ```
 
+## License
+
+This code is licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). Some external dependencies have their own license.
+
+The DukeMTMC dataset is licensed under [CC BY-NC-SA 4.0](http://vision.cs.duke.edu/DukeMTMC/LICENSE.txt)
+
 
 
 

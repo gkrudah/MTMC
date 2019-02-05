@@ -1,3 +1,7 @@
+# ---> Announcement <---
+
+The [CVPR2019 Workshop on Target Re-Identification and Multi-Target Multi-Camera Tracking](https://reid-mct.github.io/2019/) is now accepting paper submissions, and there will be three international challenges on withheld data, one on MTMC Tracking and two on ReID. More details to come soon.
+
 # DeepCC
 **Features for Multi-Target Multi-Camera Tracking and Re-Identification. CVPR 2018**
 

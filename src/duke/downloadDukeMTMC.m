@@ -5,6 +5,10 @@ dataset.videoParts = [9, 9, 9, 9, 9, 8, 8, 9];
 % Set these accordingly
 dataset.savePath = 'F:/DukeMTMC/'; % Where to store DukeMTMC (160 GB)
 
+% cleanup dataset.savePath
+dataset.savePath = cleanupPath(dataset.savePath);
+fprintf(['Download path: ' dataset.savePath '\n']);
+
 GET_ALL               = false; % Set this to true if you want to download everything
 GET_GROUND_TRUTH      = true;
 GET_CALIBRATION       = true;
@@ -16,7 +20,6 @@ GET_REID              = true;
 GET_VIDEO_REID        = false;
 GET_FRAMES            = false; % Not included in GET_ALL to save space, must be manually set on
 
-options = weboptions('Timeout', 60);
 
 %% Create folder structure
 fprintf('Creating folder structure...\n');
@@ -39,9 +42,9 @@ if GET_ALL || GET_GROUND_TRUTH
     urls = {'http://vision.cs.duke.edu/DukeMTMC/data/ground_truth/trainval.mat', ...
         'http://vision.cs.duke.edu/DukeMTMC/data/ground_truth/trainvalRaw.mat'};
     for k = 1:length(urls)
+        url = urls{k};
         filename = sprintf('%sground_truth/%s',dataset.savePath,filenames{k});
-        fprintf([filename '\n']);
-        websave(filename,urls{k},options);
+        downloadFunc(filename,url)
     end
 end
 %% Download calibration
@@ -53,9 +56,9 @@ if GET_ALL || GET_CALIBRATION
     filenames = {'calibration.txt', 'camera_position.txt', 'ROIs.txt'};
     
     for k = 1:length(urls)
+        url = urls{k};
         filename = sprintf('%scalibration/%s',dataset.savePath,filenames{k});
-        fprintf([filename '\n']);
-        websave(filename,urls{k},options);
+        downloadFunc(filename,url)
     end
 end
 
@@ -64,8 +67,7 @@ if GET_ALL || GET_OPENPOSE
     for cam = 1:dataset.numCameras
         url = sprintf('http://vision.cs.duke.edu/DukeMTMC/data/detections/openpose/camera%d.mat',cam);
         filename = sprintf('%sdetections/openpose/camera%d.mat',dataset.savePath,cam);
-        fprintf([filename '\n']);
-        websave(filename,url,options);
+        downloadFunc(filename,url)
     end
 end
 
@@ -76,8 +78,7 @@ if GET_ALL || GET_VIDEOS
         for part = 0:dataset.videoParts(cam)
             url = sprintf('http://vision.cs.duke.edu/DukeMTMC/data/videos/camera%d/%05d.MTS',cam,part);
             filename = sprintf('%svideos/camera%d/%05d.MTS',dataset.savePath,cam,part);
-            fprintf([filename '\n']);
-            websave(filename,url,options);
+            downloadFunc(filename,url)
         end
     end
     fprintf('Data download complete.\n');
@@ -89,8 +90,7 @@ if GET_ALL || GET_DPM
     for cam = 1:dataset.numCameras
         url = sprintf('http://vision.cs.duke.edu/DukeMTMC/data/detections/DPM/camera%d.mat',cam);
         filename = sprintf('%sdetections/DPM/camera%d.mat',dataset.savePath,cam);
-        fprintf([filename '\n']);
-        websave(filename,url,options);
+        downloadFunc(filename,url)
     end
 end
 
@@ -100,8 +100,7 @@ if GET_ALL || GET_FGMASKS
     for cam = 1:dataset.numCameras
         url = sprintf('http://vision.cs.duke.edu/DukeMTMC/data/masks/camera%d.tar.gz',cam);
         filename = sprintf('%smasks/camera%d.tar.gz',dataset.savePath,cam);
-        fprintf([filename '\n']);
-        websave(filename,url,options);
+        downloadFunc(filename,url)
     end
     
     % Extract masks
@@ -124,18 +123,16 @@ end
 %% Download DukeMTMC-reID
 if GET_ALL || GET_REID
     url = 'http://vision.cs.duke.edu/DukeMTMC/data/misc/DukeMTMC-reID.zip';
-    filename = fullfile(dataset.savePath,'DukeMTMC-reID.zip');
-    fprintf('DukeMTMC-reID.zip\n');
-    websave(filename,url,options);
+    filename = sprintf('%s/%s',dataset.savePath,'DukeMTMC-reID.zip');
+    downloadFunc(filename,url)
     unzip(filename, dataset.savePath);
 end
 
 %% Download DukeMTMC-VideoReID
 if GET_ALL || GET_VIDEO_REID
     url = 'http://vision.cs.duke.edu/DukeMTMC/data/misc/DukeMTMC-VideoReID.zip';
-    filename = fullfile(dataset.savePath,'DukeMTMC-VideoReID.zip');
-    fprintf('DukeMTMC-VideoReID.zip\n');
-    websave(filename,url,options);
+    filename = sprintf('%s/%s',dataset.savePath,'DukeMTMC-VideoReID.zip');
+    downloadFunc(filename,url)
     unzip(filename, dataset.savePath);
 end
 
@@ -151,5 +148,28 @@ if GET_FRAMES
         framesDir = [dataset.savePath 'frames/camera' num2str(cam) '/%06d.jpg'];
         command = [ffmpegPath ' -i ' filelist '" -qscale:v 1 -f image2 ' framesDir];
         system(command);
+    end
+end
+
+
+%% Functions
+
+function downloadFunc(filename,url)
+% Function to download and avoid overriding existing files
+    options = weboptions('Timeout', 60);
+    
+    fprintf([filename '\n']);
+    if ~isfile(filename)
+        websave(filename,url,options);
+    else
+        fprintf('Skipped - File exists !!! (delete to redownload)\n');
+    end
+end
+
+function path = cleanupPath(path)
+% cleanup path, ensures that it uses '/' instead of '\' and ends with '/'
+    path = strrep(path, '\', '/');
+    if ~endsWith(path, '/')
+        path = strcat(path, '/');
     end
 end

@@ -50,10 +50,8 @@ end
 %% Download calibration
 if GET_ALL || GET_CALIBRATION
     fprintf('Downloading calibration...\n');
-    urls = {'http://vision.cs.duke.edu/DukeMTMC/data/calibration/calibration.txt', ...
-        'http://vision.cs.duke.edu/DukeMTMC/data/calibration/camera_position.txt', ...
-        'http://vision.cs.duke.edu/DukeMTMC/data/calibration/ROIs.txt'};
-    filenames = {'calibration.txt', 'camera_position.txt', 'ROIs.txt'};
+    urls = {'http://vision.cs.duke.edu/DukeMTMC/data/calibration/DukeMTMC_calibration.zip'};
+    filenames = {'DukeMTMC_calibration.zip'};
     
     for k = 1:length(urls)
         url = urls{k};

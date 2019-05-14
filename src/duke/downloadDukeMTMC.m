@@ -3,15 +3,15 @@ dataset.numCameras = 8;
 dataset.videoParts = [9, 9, 9, 9, 9, 8, 8, 9];
 
 % Set these accordingly
-dataset.savePath = 'F:/DukeMTMC/'; % Where to store DukeMTMC (160 GB)
+dataset.savePath = 'E:/DukeMTMC/'; % Where to store DukeMTMC (160 GB)
 
 % cleanup dataset.savePath
 dataset.savePath = cleanupPath(dataset.savePath);
 fprintf(['Download path: ' dataset.savePath '\n']);
 
 GET_ALL               = false; % Set this to true if you want to download everything
-GET_GROUND_TRUTH      = true;
-GET_CALIBRATION       = true;
+GET_GROUND_TRUTH      = false;
+GET_CALIBRATION       = false;
 GET_VIDEOS            = true;
 GET_DPM               = false;
 GET_OPENPOSE          = true;
@@ -72,7 +72,7 @@ end
 %% Download videos
 if GET_ALL || GET_VIDEOS
     fprintf('Downloading videos (146 GB)...\n');
-    for cam = 1:dataset.numCameras
+    for cam = 5:dataset.numCameras
         for part = 0:dataset.videoParts(cam)
             url = sprintf('http://vision.cs.duke.edu/DukeMTMC/data/videos/camera%d/%05d.MTS',cam,part);
             filename = sprintf('%svideos/camera%d/%05d.MTS',dataset.savePath,cam,part);

@@ -64,6 +64,15 @@ from nets import resnet_utils
 resnet_arg_scope = resnet_utils.resnet_arg_scope
 slim = tf.contrib.slim
 
+# modified by ha
+def swish(x, limit=0):
+  Swish = x * tf.nn.sigmoid(x)
+
+  if limit != 0:
+    Swish = tf.clip_by_value(Swish, clip_value_max=limit)
+
+  return Swish
+
 
 @slim.add_arg_scope
 def bottleneck(inputs,
@@ -107,22 +116,43 @@ def bottleneck(inputs,
           inputs,
           depth, [1, 1],
           stride=stride,
-          activation_fn=tf.nn.relu6 if use_bounded_activations else None,
-          scope='shortcut')
+          # modified by ha
+          activation_fn=tf.nn.relu6 if use_bounded_activations else None, scope='shortcut')
+      # if use_bounded_activations:
+        # shortcut = swish(shortcut, limit=6)
 
-    residual = slim.conv2d(inputs, depth_bottleneck, [1, 1], stride=1,
-                           scope='conv1')
+    residual = slim.batch_norm(inputs=inputs)
+    residual = tf.nn.relu(residual)
+    residual = slim.conv2d(residual, depth_bottleneck, [1, 1], stride=1,
+                           scope='conv1', activation_fn=None)
+
+    residual = slim.batch_norm(inputs=residual)
+    residual = tf.nn.relu(residual)
     residual = resnet_utils.conv2d_same(residual, depth_bottleneck, 3, stride,
-                                        rate=rate, scope='conv2')
+                                        rate=rate, scope='conv2', activation=None)
+
+    residual = slim.batch_norm(inputs=residual)
+    residual = tf.nn.relu(residual)
     residual = slim.conv2d(residual, depth, [1, 1], stride=1,
                            activation_fn=None, scope='conv3')
 
     if use_bounded_activations:
       # Use clip_by_value to simulate bandpass activation.
       residual = tf.clip_by_value(residual, -6.0, 6.0)
-      output = tf.nn.relu6(shortcut + residual)
+
+      # modified by ha
+      # output = swish(x=shortcut + residual, limit=6)
+      # output = slim.batch_norm(inputs=shortcut + residual)
+      # output = tf.nn.relu6(output)
+      # output = tf.layers.batch_normalization(inputs=output)
+      output = shortcut + residual
     else:
-      output = tf.nn.relu(shortcut + residual)
+      # modified by ha
+      # output = swish(x=shortcut + residual)
+      # output = slim.batch_norm(inputs=shortcut + residual)
+      # output = tf.nn.relu(output)
+      # output = tf.layers.batch_normalization(inputs=output)
+      output = shortcut + residual
 
     return slim.utils.collect_named_outputs(outputs_collections,
                                             sc.original_name_scope,

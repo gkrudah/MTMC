@@ -1,5 +1,7 @@
 function evaluate_res_duke_fast(opts)
 
+tic % modified by ha
+
 mkdir src/external/DukeMTMC-reID_evaluation/data
 rank_size = 4000;
 
@@ -105,3 +107,5 @@ figure;
 s = 50;
 CMC_curve = CMC ;
 plot(1:s, CMC_curve(:, 1:s));
+
+toc % modified by ha

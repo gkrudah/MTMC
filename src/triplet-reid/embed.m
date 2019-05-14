@@ -1,5 +1,7 @@
 function embed(opts)
 
+tic % modified by ha
+
 net = opts.net;
 
 cur_dir = pwd;
@@ -21,3 +23,4 @@ for k = 1:length(datasets)
 end
 
 cd(cur_dir)
+toc % modified by ha

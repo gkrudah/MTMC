@@ -3,11 +3,11 @@ function opts = get_opts()
 addpath(genpath('src'))
 
 opts = [];
-opts.dataset_path    = 'F:/DukeMTMC/';
+opts.dataset_path    = 'E:/DukeMTMC/';
 opts.gurobi_path     = 'C:/gurobi800/win64/matlab';
 opts.experiment_root = 'experiments';
 opts.experiment_name = 'demo';
-opts.python3         = 'python3'; 
+opts.python3         = 'python'; 
 
 opts.reader = DukeVideoReader(opts.dataset_path);
 
@@ -68,13 +68,13 @@ identities.extract_images = true;
 % CNN model
 net = [];
 net.train_set = 'data/duke_train.csv';
-net.image_root = 'F:/DukeMTMC/DukeMTMC-reID';
-net.model_name = 'resnet_v1_50';
-net.initial_checkpoint = 'resnet_v1_50.ckpt';
+net.image_root = 'E:/DukeMTMC/DukeMTMC-reID';
+net.model_name = 'mobilenet.mobilenet_v2_1'; % modified by ha (default resnet_v1_50)
+net.initial_checkpoint = 'mobilenet.mobilenet_v2_1.4_224.ckpt'; % modified by ha (default resnet_v1_50.ckpt)
 net.experiment_root = 'experiments/demo_weighted_triplet';
 net.embedding_dim = 128;
-net.batch_p = 18;
-net.batch_k = 4;
+net.batch_p = 9; % modified by ha (default 18)
+net.batch_k = 2; % modified by ha (default 4)
 net.pre_crop_height = 288;
 net.pre_crop_width = 144;
 net.input_width = 128;
@@ -82,13 +82,13 @@ net.input_height = 256;
 net.margin = 'soft';
 net.metric = 'euclidean';
 net.loss = 'weighted_triplet';
-net.learning_rate = 0.0003;
-net.train_iterations = 25000;
-net.decay_start_iteration = 15000;
-net.gpu_device = 0;
+net.learning_rate = 0.0003; % modified by ha (default 0.0003)
+net.train_iterations = 25000; % modified by ha (default 25000)
+net.decay_start_iteration = 15000; % modified by ha (default 15000)
+net.gpu_device = 1; % modified by ha (default 0)
 net.augment = true;
 net.resume = false;
-net.checkpoint_frequency = 1000;
+net.checkpoint_frequency = 12500;
 net.hard_pool_size = 0;
 
 opts.tracklets = tracklets;

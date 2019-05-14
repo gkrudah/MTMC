@@ -1,4 +1,5 @@
 experiments/
+src/triplet-reid/mobilenet/
 src/external/mexopencv/
 *.mex*
 *.asv
